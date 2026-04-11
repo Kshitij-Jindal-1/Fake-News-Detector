@@ -1,0 +1,331 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   THEME VARIABLES
+   ============================================ */
+:root {
+  /* Dark theme (default) - Rich Slate/Blue-Grey Base */
+  --bg-primary: #0f172a; /* Slate 900 */
+  --bg-secondary: #1e293b; /* Slate 800 */
+  --bg-deep: #020617; /* Slate 950 */
+  --border-color: #334155; /* Slate 700 */
+  --text-primary: #f8fafc; /* Slate 50 */
+  --text-secondary: #94a3b8; /* Slate 400 */
+  --text-muted: #64748b; /* Slate 500 */
+  
+  --primary-accent: #22c55e; /* Green 500 */
+  --primary-glow: rgba(34, 197, 94, 0.4);
+  
+  --gauge-track: #334155;
+  --card-blue: rgba(30, 58, 138, 0.3); /* Blue 900 with opacity */
+  --card-blue-border: #1e3a8a;
+  --card-red: rgba(127, 29, 29, 0.3); /* Red 900 with opacity */
+  --card-red-border: #7f1d1d;
+  
+  /* Badge Colors */
+  --badge-purple-bg: rgba(88, 28, 135, 0.4); /* Purple 900/40 */
+  --badge-purple-text: #c084fc; /* Purple 400 */
+  --badge-purple-border: #6b21a8; /* Purple 800 */
+  
+  --badge-cyan-bg: rgba(22, 78, 99, 0.4); /* Cyan 900/40 */
+  --badge-cyan-text: #22d3ee; /* Cyan 400 */
+  --badge-cyan-border: #155e75; /* Cyan 800 */
+  
+  --step-done-bg: rgba(34, 197, 94, 0.15);
+  --step-active-bg: rgba(34, 197, 94, 0.1);
+  --ticker-bg: #020617;
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(148, 163, 184, 0.1);
+  
+  /* Adaptive Text Colors (Light in Dark Mode) */
+  --text-success: #4ade80; /* Green 400 */
+  --text-info: #60a5fa;    /* Blue 400 */
+  --text-warning: #facc15; /* Yellow 400 */
+  --text-error: #f87171;   /* Red 400 */
+}
+
+[data-theme="light"] {
+  /* Light theme - Clean & Crisp Slate Base */
+  --bg-primary: #f8fafc; /* Slate 50 */
+  --bg-secondary: #ffffff;
+  --bg-deep: #f1f5f9; /* Slate 100 */
+  --border-color: #cbd5e1; /* Slate 300 - Slightly darker for visibility */
+  --text-primary: #0f172a; /* Slate 900 */
+  --text-secondary: #475569; /* Slate 600 */
+  --text-muted: #94a3b8; /* Slate 400 */
+  
+  --primary-accent: #16a34a; /* Green 600 (slightly darker for contrast) */
+  --primary-glow: rgba(22, 163, 74, 0.3);
+  
+  --gauge-track: #e2e8f0;
+  --card-blue: #eff6ff; /* Blue 50 */
+  --card-blue-border: #bfdbfe;
+  --card-green: #f0fdf4; /* Green 50 */
+  --card-green-border: #bbf7d0;
+  --card-red: #fef2f2; /* Red 50 */
+  --card-red-border: #fecaca;
+  
+  /* Badge Colors */
+  --badge-purple-bg: #f3e8ff; /* Purple 100 */
+  --badge-purple-text: #7e22ce; /* Purple 700 */
+  --badge-purple-border: #d8b4fe; /* Purple 300 */
+  
+  --badge-cyan-bg: #ecfeff; /* Cyan 100 */
+  --badge-cyan-text: #0e7490; /* Cyan 700 */
+  --badge-cyan-border: #a5f3fc; /* Cyan 300 */
+  
+  --step-done-bg: rgba(22, 163, 74, 0.1);
+  --step-active-bg: rgba(22, 163, 74, 0.08);
+  --ticker-bg: #f1f5f9;
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.65); /* Slightly more transparent */
+  --glass-border: rgba(203, 213, 225, 0.5); /* Stronger border for separation */
+  
+  /* Adaptive Text Colors (Dark in Light Mode) */
+  --text-success: #15803d; /* Green 700 */
+  --text-info: #1d4ed8;    /* Blue 700 */
+  --text-warning: #b45309; /* Amber 700 */
+  --text-error: #b91c1c;   /* Red 700 */
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.4s ease, color 0.4s ease;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
+/* Universal Theme Transition */
+*, *::before, *::after {
+  transition: background-color 0.3s ease-in-out, 
+              border-color 0.3s ease-in-out, 
+              color 0.3s ease-in-out, 
+              box-shadow 0.3s ease-in-out;
+}
+
+/* Glass Panel Utility */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Primary Button Glow */
+.btn-primary {
+  box-shadow: 0 0 15px var(--primary-glow);
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  box-shadow: 0 0 25px var(--primary-glow);
+  transform: translateY(-1px);
+}
+
+/* Card Hover Lift */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+  border-color: var(--primary-accent);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+/* Loading bar glow */
+@keyframes glow {
+  0% { transform: translateX(-100%); opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0.5; }
+}
+.animate-glow {
+  animation: glow 2.5s linear infinite;
+}
+
+/* Slow spinner for loading steps */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 1.2s linear infinite;
+  display: inline-block;
+}
+
+/* Fade + slide in for result sections */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeSlideIn {
+  animation: fadeSlideIn 0.5s ease-out both;
+}
+
+/* Confetti falling */
+@keyframes confetti {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(400px) rotate(720deg);
+    opacity: 0;
+  }
+}
+.animate-confetti {
+  animation: confetti 2s ease-in forwards;
+}
+
+/* Shake effect for fake news */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+.animate-shake {
+  animation: shake 0.6s ease-in-out;
+}
+
+/* Theme toggle button animation */
+@keyframes themeToggleSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.theme-toggle-icon {
+  transition: transform 0.3s ease;
+}
+.theme-toggle-icon:hover {
+  transform: scale(1.2);
+}
+
+/* ============================================
+   NEWS TICKER
+   ============================================ */
+
+.news-ticker-bar {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, var(--ticker-bg), var(--bg-primary));
+  border-bottom: 1px solid var(--border-color);
+  overflow: hidden;
+  position: relative;
+}
+
+.news-ticker-label {
+  background: #22c55e;
+  color: #000;
+  padding: 8px 16px;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  z-index: 10;
+  position: relative;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+}
+
+.news-ticker-loading {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-left: 16px;
+}
+
+.news-ticker-track {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(90deg, transparent 0%, black 3%, black 97%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 3%, black 97%, transparent 100%);
+}
+
+.news-ticker-content {
+  display: flex;
+  white-space: nowrap;
+  animation: tickerScroll linear infinite;
+  will-change: transform;
+}
+
+@keyframes tickerScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.news-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  margin: 0 24px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.news-ticker-item:hover {
+  color: #22c55e;
+}
+
+.news-ticker-text {
+  max-width: 500px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.news-ticker-source {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.6;
+  padding: 1px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.news-ticker-item::after {
+  content: '•';
+  color: var(--text-muted);
+  opacity: 0.4;
+  margin-left: 24px;
+  font-size: 0.6rem;
+}
+
+.news-ticker-item:last-child::after {
+  content: none;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

@@ -1,0 +1,82 @@
+# ========================
+# Python / Django
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+staticfiles/
+media/
+
+# ========================
+# ML Models & Datasets
+# ========================
+# Large CSV datasets (60MB+ each)
+ProjectIBM/Fake.csv
+ProjectIBM/True.csv
+
+# Trained model & tokenizer files
+ProjectIBM/cnn_model.h5
+ProjectIBM/tokenizer.pkl
+
+# HuggingFace model cache (~500MB downloaded models)
+blog/predictor/models/models--*/
+blog/predictor/models/.locks/
+
+# ========================
+# Databases
+# ========================
+*.sqlite3
+*.db
+
+# ========================
+# Environment Variables
+# ========================
+.env
+.env.local
+.env.*.local
+
+# ========================
+# Node.js
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+TruthChecker/client/dist/
+TruthChecker/client/build/
+
+# ========================
+# OS & Editor
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+
+# VS Code (optional — remove these lines if you want to share settings)
+.vscode/
+
+# ========================
+# Misc debug artifacts
+# ========================
+bing_debug.html

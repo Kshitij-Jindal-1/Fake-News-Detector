@@ -1,0 +1,26 @@
+# Django and REST Framework
+Django>=3.0.8
+djangorestframework
+django-cors-headers
+
+# Machine Learning - CNN (Legacy)
+tensorflow>=2.0
+joblib
+
+# Machine Learning - DistilBERT (New)
+transformers>=4.30.0
+torch>=2.0.0
+sentencepiece
+
+# Web Scraping
+beautifulsoup4
+requests
+newspaper3k
+lxml_html_clean
+trafilatura
+
+# Utilities
+numpy
+
+# Source Verification (Web Search)
+duckduckgo-search>=6.0.0
