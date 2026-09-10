@@ -274,7 +274,7 @@ def search_bing(query: str, max_results: int = 10) -> List[Dict]:
         if results:
             print(f"[SEARCH-BING] Got {len(results)} results for '{query[:60]}'")
             for r in results[:3]:
-                print(f"  → {r['source']}: {r['title'][:50]}")
+                print(f"  -> {r['source']}: {r['title'][:50]}")
         else:
             print(f"[SEARCH-BING] 0 results parsed for '{query[:60]}'")
         
@@ -598,7 +598,7 @@ def calculate_source_score(
     if source_url and is_trusted_domain(source_url):
         input_is_trusted = True
         trust_ratio = 1.0
-        print(f"[SOURCE VERIFY] Input URL ({get_domain(source_url)}) is a trusted source → Trusted Ratio overridden to 1.0")
+        print(f"[SOURCE VERIFY] Input URL ({get_domain(source_url)}) is a trusted source -> Trusted Ratio overridden to 1.0")
 
     print(f"[SOURCE VERIFY] Signal 1 - Coverage Density: {coverage:.4f} ({total_results} results)")
     print(f"[SOURCE VERIFY] Signal 2 - Trusted Ratio: {trust_ratio:.4f} ({trusted_count}/{total_results} from search, {'overridden' if input_is_trusted else 'as-is'})")
@@ -620,7 +620,7 @@ def calculate_source_score(
         effective_coverage = coverage * penalty
         effective_trust = trust_ratio * penalty
         source_score = (effective_coverage * w_coverage) + (effective_trust * w_trust) + (relevance * w_relevance)
-        print(f"[SOURCE VERIFY] ⚠ Low content relevance ({relevance:.2f}) — penalizing coverage/trust by {penalty:.2f}")
+        print(f"[SOURCE VERIFY] [!] Low content relevance ({relevance:.2f}) -- penalizing coverage/trust by {penalty:.2f}")
     else:
         source_score = (coverage * w_coverage) + (trust_ratio * w_trust) + (relevance * w_relevance)
 
@@ -629,7 +629,7 @@ def calculate_source_score(
     # The source's credibility is already established — minimum 75%.
     if input_is_trusted:
         source_score = max(source_score, 0.75)
-        print(f"[SOURCE VERIFY] Trusted source floor applied: source_score ≥ 0.75")
+        print(f"[SOURCE VERIFY] Trusted source floor applied: source_score >= 0.75")
 
     source_score = max(0.0, min(1.0, round(source_score, 4)))
     print(f"[SOURCE VERIFY] Final source score: {source_score:.4f}")
@@ -737,7 +737,7 @@ def verify_with_sources(text: str, source_url: str = None) -> Dict:
         # NOT evidence that the story isn't covered.
         search_insufficient = len(all_results) < 3
         if search_insufficient:
-            print(f"[SOURCE VERIFY] ⚠ SEARCH INSUFFICIENT: Only {len(all_results)} results. "
+            print(f"[SOURCE VERIFY] [!] SEARCH INSUFFICIENT: Only {len(all_results)} results. "
                   f"Search engines may be rate-limited. Source score will be marked unreliable.")
 
         # Step 3: Identify trusted sources
@@ -794,13 +794,15 @@ def verify_with_sources(text: str, source_url: str = None) -> Dict:
 # SCORE COMBINATION (ML + Source)
 # ============================================================================
 
-def combine_scores(ml_probability: float, source_score: float, history_signal: Dict = None, search_insufficient: bool = False, trusted_count: int = 0, content_relevance: float = 0.5) -> Dict:
+def combine_scores(ml_probability: float, source_score: float, history_signal: Dict = None, search_insufficient: bool = False, trusted_count: int = 0, content_relevance: float = 0.5, word_count: int = 999) -> Dict:
     """
     Combine ML prediction with source verification score and optional
     historical feedback signal.
     
     Strategy:
     - Base: weighted average (ML × 0.4) + (Source × 0.6)
+    - SHORT TEXT PROTECTION: For headlines (<150 words), ML models are
+      unreliable. Shift to source-heavy weights (ML × 0.15, Source × 0.85)
     - Agreement boost: if both agree, boost confidence
     - Disagreement handling: if they strongly disagree, trust source more
     - STRONG SOURCE OVERRIDE: if 5+ trusted sources confirm the story,
@@ -812,6 +814,19 @@ def combine_scores(ml_probability: float, source_score: float, history_signal: D
     """
     ml_weight = getattr(settings, 'ML_SCORE_WEIGHT', 0.4)
     source_weight = getattr(settings, 'SOURCE_SCORE_WEIGHT', 0.6)
+    
+    short_text_threshold = getattr(settings, 'SHORT_TEXT_THRESHOLD', 150)
+    is_short_text = word_count < short_text_threshold
+
+    # SHORT TEXT PROTECTION
+    # ML models trained on articles produce near-random scores for headlines.
+    # Even headline-specific models are less reliable than source verification
+    # for short inputs. Trust source verification much more for short text.
+    if is_short_text and not search_insufficient:
+        ml_weight = 0.15
+        source_weight = 0.85
+        print(f"[COMBINE] Short text detected ({word_count} words < {short_text_threshold}) "
+              f"-- using source-heavy weights: ML={ml_weight}, Source={source_weight}")
 
     # CRITICAL: Search failure protection
     # When search engines rate-limit and return 0-2 results, the source score
@@ -823,7 +838,7 @@ def combine_scores(ml_probability: float, source_score: float, history_signal: D
         # Also set source_score to a neutral 0.5 instead of the near-zero
         # value that a failed search produces
         source_score = max(source_score, 0.5)
-        print(f"[COMBINE] ⚠ Search insufficient — using ML-heavy weights: "
+        print(f"[COMBINE] [!] Search insufficient -- using ML-heavy weights: "
               f"ML={ml_weight}, Source={source_weight}, source_score adjusted to {source_score:.2f}")
 
     # Disagreement detection (only meaningful if search was successful)
@@ -850,9 +865,10 @@ def combine_scores(ml_probability: float, source_score: float, history_signal: D
     # When 5+ trusted news outlets independently report the same story,
     # the story is almost certainly real. The ML model should not be able
     # to override this strong evidence from the real world.
-    # CRITICAL: Only applies when content_relevance > 0.4 — meaning the
-    # trusted sources actually found THIS story, not unrelated articles.
-    if not search_insufficient and trusted_count >= 5 and content_relevance > 0.4:
+    # For short text (headlines), content_relevance is naturally lower since
+    # there's less text to match against, so we use a lower threshold.
+    relevance_threshold = 0.2 if is_short_text else 0.4
+    if not search_insufficient and trusted_count >= 5 and content_relevance > relevance_threshold:
         floor = 0.55  # At least "Likely TRUE"
         if trusted_count >= 8:
             floor = 0.65  # Strong "Likely TRUE"
@@ -860,12 +876,12 @@ def combine_scores(ml_probability: float, source_score: float, history_signal: D
             floor = 0.75  # "High confidence TRUE"
         
         if combined < floor:
-            print(f"[COMBINE] 🛡️ Strong source override: {trusted_count} trusted sources, "
-                  f"relevance={content_relevance:.2f}. Raising score from {combined:.2f} to {floor:.2f}")
+            print(f"[COMBINE] [OVERRIDE] Strong source override: {trusted_count} trusted sources, "
+                  f"relevance={content_relevance:.2f} (threshold={relevance_threshold}). Raising score from {combined:.2f} to {floor:.2f}")
             combined = floor
-    elif not search_insufficient and trusted_count >= 5 and content_relevance <= 0.4:
-        print(f"[COMBINE] ⚠ Strong source override BLOCKED: {trusted_count} trusted sources found, "
-              f"but content_relevance={content_relevance:.2f} too low (results aren't about this story)")
+    elif not search_insufficient and trusted_count >= 5 and content_relevance <= relevance_threshold:
+        print(f"[COMBINE] [!] Strong source override BLOCKED: {trusted_count} trusted sources found, "
+              f"but content_relevance={content_relevance:.2f} too low (threshold={relevance_threshold})")
 
     # History blending: if we've seen similar articles before, use that knowledge
     history_applied = False
@@ -881,6 +897,15 @@ def combine_scores(ml_probability: float, source_score: float, history_signal: D
             history_applied = True
             print(f"[COMBINE] History blended: score={history_score:.4f}, "
                   f"confidence={history_confidence:.4f}, influence={history_influence:.4f}")
+
+    # Re-apply strong source override AFTER history blending as the final floor.
+    # History from previous incorrect predictions should not override real-world
+    # evidence from 5+ trusted news outlets confirming a story RIGHT NOW.
+    if not search_insufficient and trusted_count >= 5 and content_relevance > relevance_threshold:
+        if combined < floor:
+            print(f"[COMBINE] [OVERRIDE] Re-applying source floor after history: "
+                  f"raising {combined:.2f} back to {floor:.2f}")
+            combined = floor
 
     combined = max(0.0, min(1.0, combined))
 

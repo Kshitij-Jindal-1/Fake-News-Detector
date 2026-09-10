@@ -1,16 +1,16 @@
 """
 ML Model utilities for fake news prediction.
-Uses DistilBERT (RoBERTa) model via HuggingFace Transformers.
+Uses a HuggingFace Transformer model (RoBERTa/BERT) for classification.
 """
 
-from .utils_distilbert import get_distilbert_predictor
+from .ml_predictor import get_predictor_instance
 
 
 def get_predictor():
     """
-    Get the DistilBERT predictor instance.
+    Get the ML predictor instance.
 
     Returns:
-        DistilBERTPredictor instance (lazy-loaded singleton).
+        TransformerPredictor instance (lazy-loaded singleton).
     """
-    return get_distilbert_predictor()
+    return get_predictor_instance()

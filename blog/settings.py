@@ -139,21 +139,32 @@ CORS_ALLOW_ALL_ORIGINS = True  # For development only
 
 # ML Model Configuration
 
-# === DistilBERT Model (Active) ===
-USE_DISTILBERT = True  # Set to False to use CNN model instead
+# === HuggingFace Transformer Model ===
 
 # Pre-trained model from HuggingFace
-# Options (change DISTILBERT_MODEL_NAME to switch):
+# Options (change MODEL_NAME to switch):
 #   - 'jy46604790/Fake-News-Bert-Detect' (99.5% accuracy, diverse topics)
 #   - 'hamzab/roberta-fake-news-classification' (good for political news)
 #   - 'mrm8488/bert-tiny-finetuned-fake-news-detection' (smaller, faster)
-DISTILBERT_MODEL_NAME = 'hamzab/roberta-fake-news-classification'
+MODEL_NAME = 'hamzab/roberta-fake-news-classification'
 
-# Model cache directory (downloads ~500MB on first run)
-DISTILBERT_CACHE_DIR = os.path.join(BASE_DIR, 'blog', 'predictor', 'models')
+# Headline-specific model for short text (< SHORT_TEXT_THRESHOLD words)
+# Trained on headlines/titles — much better at classifying short inputs
+# Options: 'jy46604790/Fake-News-Bert-Detect' (99.5% acc, diverse topics)
+HEADLINE_MODEL_NAME = 'jy46604790/Fake-News-Bert-Detect'
+SHORT_TEXT_THRESHOLD = 150  # words — inputs below this use the headline model
 
-# Shorter sequence length for faster inference
-DISTILBERT_MAX_LENGTH = 256
+# Label index overrides for models with ambiguous labels (LABEL_0/LABEL_1)
+# Maps model_name -> index of the REAL/TRUE label
+MODEL_LABEL_OVERRIDES = {
+    'jy46604790/Fake-News-Bert-Detect': 0,  # LABEL_0 = REAL in this model
+}
+
+# Model cache directory (downloads ~500MB per model on first run)
+MODEL_CACHE_DIR = os.path.join(BASE_DIR, 'blog', 'predictor', 'models')
+
+# Max token length for input text
+MODEL_MAX_LENGTH = 256
 
 # GPU Configuration (for RTX 3050Ti 4GB)
 USE_GPU = True  # Enable GPU acceleration with CUDA

@@ -3,11 +3,7 @@ Django>=3.0.8
 djangorestframework
 django-cors-headers
 
-# Machine Learning - CNN (Legacy)
-tensorflow>=2.0
-joblib
-
-# Machine Learning - DistilBERT (New)
+# Machine Learning - DistilBERT / RoBERTa
 transformers>=4.30.0
 torch>=2.0.0
 sentencepiece

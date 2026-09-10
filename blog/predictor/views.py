@@ -43,6 +43,7 @@ class PredictTextView(APIView):
                 return Response(ml_result, status=status.HTTP_400_BAD_REQUEST)
             
             ml_probability = ml_result.get('probability', 0.5)
+            word_count = ml_result.get('word_count', len(text.split()))
             
             # Step 3: Source Verification (if enabled)
             source_verification_enabled = getattr(django_settings, 'SOURCE_VERIFICATION_ENABLED', True)
@@ -55,7 +56,7 @@ class PredictTextView(APIView):
                 content_relevance = verification.get('signal_relevance', 0.5)
                 
                 # Step 4: Combine scores (ML + Source + History)
-                combined = combine_scores(ml_probability, source_score, history_signal, search_insufficient, trusted_count, content_relevance)
+                combined = combine_scores(ml_probability, source_score, history_signal, search_insufficient, trusted_count, content_relevance, word_count=word_count)
                 
                 result = {
                     'prediction': 'True' if combined['combined_probability'] > 0.5 else 'Fake',
@@ -156,6 +157,7 @@ class PredictURLView(APIView):
                 return Response(ml_result, status=status.HTTP_400_BAD_REQUEST)
             
             ml_probability = ml_result.get('probability', 0.5)
+            word_count = ml_result.get('word_count', len(text.split()))
             
             # Source Verification
             source_verification_enabled = getattr(django_settings, 'SOURCE_VERIFICATION_ENABLED', True)
@@ -166,7 +168,7 @@ class PredictURLView(APIView):
                 search_insufficient = verification.get('search_insufficient', False)
                 trusted_count = verification.get('trusted_count', 0)
                 content_relevance = verification.get('signal_relevance', 0.5)
-                combined = combine_scores(ml_probability, source_score, history_signal, search_insufficient, trusted_count, content_relevance)
+                combined = combine_scores(ml_probability, source_score, history_signal, search_insufficient, trusted_count, content_relevance, word_count=word_count)
                 
                 result = {
                     'prediction': 'True' if combined['combined_probability'] > 0.5 else 'Fake',
