@@ -44,9 +44,10 @@ MODEL_CACHE_DIR = os.environ.get(
 USE_GPU = False
 USE_FP16 = False
 
-# === Single-model override for memory-constrained environments ===
-# Railway free tier can't hold two large transformer models (~1GB+ combined).
-# Use one model for both headlines and articles to halve memory usage.
-# jy46604790/Fake-News-Bert-Detect: 99.5% accuracy, works for all text lengths.
-MODEL_NAME = 'jy46604790/Fake-News-Bert-Detect'
-HEADLINE_MODEL_NAME = ''  # Empty = reuse MODEL_NAME for headlines (single-model mode)
+# === Lightweight model for memory-constrained Railway (1GB RAM) ===
+# Full-size BERT/RoBERTa (~440MB) + PyTorch (~400MB) exceeds 1GB.
+# bert-tiny is only ~17MB — fits comfortably with plenty of headroom.
+# Source verification (60% weight) compensates for the lighter ML model.
+MODEL_NAME = 'mrm8488/bert-tiny-finetuned-fake-news-detection'
+HEADLINE_MODEL_NAME = ''  # Single-model mode
+
