@@ -1,5 +1,5 @@
 """
-Production settings for HuggingFace Spaces deployment.
+Production settings for Railway / HuggingFace Spaces deployment.
 Extends the base settings.py with production-safe overrides.
 """
 
@@ -11,9 +11,9 @@ import os
 SECRET_KEY = os.environ.get('SECRET_KEY', SECRET_KEY)  # noqa: F405
 DEBUG = False
 
-# HuggingFace Spaces provides the app at a URL like:
-# https://username-spacename.hf.space
+# Allow Railway, HuggingFace, and local hosts
 ALLOWED_HOSTS = [
+    '.railway.app',       # Railway wildcard
     '.hf.space',          # HuggingFace Spaces wildcard
     'localhost',
     '127.0.0.1',
@@ -22,23 +22,25 @@ ALLOWED_HOSTS = [
 # CORS — allow your Vercel frontend
 CORS_ALLOWED_ORIGINS = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
-    'https://your-app.vercel.app'
+    'https://truthcheckerapp.vercel.app'
 ).split(',')
 
-# Also allow all HF space previews (optional but handy)
+# Also allow Railway and HF space previews
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.hf\.space$",
+    r"^https://.*\.railway\.app$",
 ]
 
 # Static files
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # noqa: F405
 
-# Model cache — use /tmp in HF Spaces (writable, but ephemeral)
+# Model cache — use /tmp (writable, but ephemeral)
 MODEL_CACHE_DIR = os.environ.get(
     'MODEL_CACHE_DIR',
     '/tmp/hf_model_cache'
 )
 
-# Disable GPU on HF Spaces CPU tier
+# Disable GPU on cloud deployments (CPU tier)
 USE_GPU = False
 USE_FP16 = False
+
