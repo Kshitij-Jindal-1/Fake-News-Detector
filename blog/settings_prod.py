@@ -44,3 +44,9 @@ MODEL_CACHE_DIR = os.environ.get(
 USE_GPU = False
 USE_FP16 = False
 
+# === Single-model override for memory-constrained environments ===
+# Railway free tier can't hold two large transformer models (~1GB+ combined).
+# Use one model for both headlines and articles to halve memory usage.
+# jy46604790/Fake-News-Bert-Detect: 99.5% accuracy, works for all text lengths.
+MODEL_NAME = 'jy46604790/Fake-News-Bert-Detect'
+HEADLINE_MODEL_NAME = ''  # Empty = reuse MODEL_NAME for headlines (single-model mode)
