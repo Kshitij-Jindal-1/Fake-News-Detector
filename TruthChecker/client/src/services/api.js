@@ -4,7 +4,7 @@
  */
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://fake-news-detector-production-66f7.up.railway.app/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

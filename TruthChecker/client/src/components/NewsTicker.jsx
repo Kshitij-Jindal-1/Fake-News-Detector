@@ -15,7 +15,8 @@ const NewsTicker = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/news/?country=in&category=general');
+        const apiBase = import.meta.env.VITE_API_URL || 'https://fake-news-detector-production-66f7.up.railway.app/api';
+        const response = await fetch(`${apiBase}/news/?country=in&category=general`);
         
         if (response.ok) {
           const data = await response.json();
