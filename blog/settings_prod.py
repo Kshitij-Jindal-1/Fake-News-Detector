@@ -51,3 +51,7 @@ USE_FP16 = False
 MODEL_NAME = 'mrm8488/bert-tiny-finetuned-fake-news-detection'
 HEADLINE_MODEL_NAME = ''  # Single-model mode
 
+# bert-tiny uses LABEL_0 = REAL (auto-detection defaults to index 1, which inverts scores)
+MODEL_LABEL_OVERRIDES = {
+    'mrm8488/bert-tiny-finetuned-fake-news-detection': 0,
+}
