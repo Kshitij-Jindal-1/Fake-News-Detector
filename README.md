@@ -3,7 +3,7 @@ title: Fake News Detector API
 emoji: FND
 colorFrom: blue
 colorTo: purple
-sdk: docker
+sdk: gradio
 app_port: 7860
 pinned: false
 ---
