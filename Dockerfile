@@ -16,15 +16,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the entire project
 COPY . .
 
-# Collect static files
-RUN python manage.py collectstatic --noinput --settings=blog.settings_prod
+# Use production settings
+ENV DJANGO_SETTINGS_MODULE=blog.settings_prod
 
-# HuggingFace Spaces requires port 7860
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# HuggingFace Spaces expects port 7860
 EXPOSE 7860
 
-# Run with gunicorn on port 7860
-CMD ["gunicorn", "blog.wsgi:application", \
-     "--bind", "0.0.0.0:7860", \
-     "--workers", "1", \
-     "--timeout", "300", \
-     "--worker-class", "sync"]
+# Use gunicorn for production
+CMD ["gunicorn", "blog.wsgi:application", "--bind", "0.0.0.0:7860", "--timeout", "300", "--workers", "1", "--threads", "4"]

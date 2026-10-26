@@ -1,3 +1,13 @@
+---
+title: Fake News Detector API
+emoji: FND
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # 🔍 Fake News Detector
 
 A full-stack AI-powered fake news detection platform that combines **RoBERTa-based ML predictions** with **real-time source verification** to determine the authenticity of news articles.

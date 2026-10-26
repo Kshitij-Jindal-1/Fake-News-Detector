@@ -18,9 +18,6 @@ trafilatura
 # Utilities
 numpy
 
-# Source Verification (Web Search)
-duckduckgo-search>=6.0.0
-
 # Production server
 gunicorn
-python-dotenv
+whitenoise
